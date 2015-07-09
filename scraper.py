@@ -1,24 +1,28 @@
-# This is a template for a Python scraper on morph.io (https://morph.io)
-# including some code snippets below that you should find helpful
+#!/usr/bin/env python
 
-# import scraperwiki
-# import lxml.html
-#
-# # Read in a page
-# html = scraperwiki.scrape("http://foo.com")
-#
-# # Find something on the page using css selectors
-# root = lxml.html.fromstring(html)
-# root.cssselect("div[align='left']")
-#
-# # Write out to the sqlite database using scraperwiki library
-# scraperwiki.sqlite.save(unique_keys=['name'], data={"name": "susan", "occupation": "software developer"})
-#
-# # An arbitrary query against the database
-# scraperwiki.sql.select("* from data where 'name'='peter'")
+import scraperwiki
+import requests
+import lxml.html
 
-# You don't have to do things with the ScraperWiki and lxml libraries.
-# You can use whatever libraries you want: https://morph.io/documentation/python
-# All that matters is that your final data is written to an SQLite database
-# called "data.sqlite" in the current working directory which has at least a table
-# called "data".
+bbcurl = "http://www.bbc.co.uk/news/england/birmingham_and_black_country/"
+
+html = scraperwiki.scrape(bbcurl)
+print lxml.html.fromstring(html)
+root = lxml.html.fromstring(html)
+h2s = root.cssselect('a.story')
+print h2s
+record = {}
+listofterms = ['crime','murder']
+for headline in h2s:
+    h2 = headline.text_content()
+    headlineurl = headline.attrib.get('href')
+    print headlineurl
+    for term in listofterms:
+        if term in h2:
+            print "YAHHEE"
+            print h2
+            record['newstitle'] = h2
+            record['url'] = bbcurl
+            print record
+            scraperwiki.sql.save(['newstitle'],record)
+    
